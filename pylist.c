@@ -16,6 +16,29 @@ struct Node* get_node()
     return (struct Node*) malloc(sizeof(struct Node));
 }
 
+struct Node* reach_pos(int pos)
+{
+    struct Node *ptr;
+    if (pos > 0)
+    {
+        ptr = head;
+        while (pos != 0)
+        {
+            ptr = ptr->right;
+            pos--;
+        }
+        return ptr->left;
+    }
+    
+    ptr = tail;
+    while (pos != -1)
+    {
+        ptr = ptr->left;
+        pos++;
+    }
+    return ptr->left;
+}
+
 void insert_first(int value)
 {
     struct Node *new = get_node();
@@ -68,29 +91,62 @@ void insert(int pos, int value)
         return;
     }
     
-    struct Node *new, *ptr, *x;
+    struct Node *new, *l, *r;
     new = get_node();
     new->data = value;
 
-    if (pos > 0)
+    l = reach_pos(pos);
+    r = l->right;
+    new->left = l;
+    new->right = r;
+    l->right = r->left = new;
+    length++;
+}
+
+void del_first()
+{
+    struct Node *ptr = head;
+    head = head->right;
+    head->left = NULL;
+    free(ptr);
+}
+
+void del_last()
+{
+    struct Node *ptr = tail;
+    tail = tail->left;
+    tail->right = NULL;
+    free(ptr);
+}
+
+void del(int pos)
+{
+    if (pos >= length || pos < 0-length)
     {
-        ptr = head;   
-        for (; pos > 1; pos--)
-            ptr = ptr->right;
+        printf("IndexError: list index %d out of range\n", pos);
+        return;
     }
-    else
+    else if (pos == 0 || pos == 0-length)
     {
-        ptr = tail;
-        for (; pos < -1; pos++)
-            ptr = ptr->left;
+        del_first();
+        length--;
+        return;
+    }
+    else if (pos == -1 || pos == length-1)
+    {
+        del_last();
+        length--;
+        return;
     }
 
-    x = ptr->right;
-    new->left = ptr;
-    new->right = x;
-    x->left = new;
-    ptr->right = new;
-    length++;
+    struct Node *l, *x, *r;
+    l = reach_pos(pos);
+    x = l->right;
+    r = x->right;
+    l->right = r; 
+    r->left = l;
+    free(x);
+    length--;
 }
 
 void print_pylist()
@@ -120,5 +176,9 @@ void main()
     insert(5, 27);
     insert(9, 90);
     insert(-11, 110);
+    print_pylist();
+    del(3);
+    print_pylist(); 
+    del(-4);
     print_pylist();
 }
