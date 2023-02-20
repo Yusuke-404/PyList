@@ -57,7 +57,7 @@ void insert_first(int value)
     head = new;    
 }
 
-void insert_last(int value)
+void append(int value)
 {
     struct Node *new = get_node();
     new->data = value;
@@ -86,7 +86,7 @@ void insert(int pos, int value)
     }
     else if (pos == -1 || pos >= length)
     {
-        insert_last(value);
+        append(value);
         length++;
         return;
     }
@@ -111,12 +111,16 @@ void del_first()
     free(ptr);
 }
 
-void del_last()
+int pop()
 {
+    int popped_elt;
     struct Node *ptr = tail;
+    popped_elt = tail->data;
     tail = tail->left;
     tail->right = NULL;
     free(ptr);
+
+    return popped_elt;
 }
 
 void del(int pos)
@@ -134,7 +138,7 @@ void del(int pos)
     }
     else if (pos == -1 || pos == length-1)
     {
-        del_last();
+        pop();
         length--;
         return;
     }
@@ -147,6 +151,49 @@ void del(int pos)
     r->left = l;
     free(x);
     length--;
+}
+
+int indexOf(int value)
+{
+    // under implementation
+    int pos = 0;
+    struct Node *ptr = head;
+    
+    while(ptr != NULL)
+    {
+        if (ptr->data == value)
+            return pos;
+        pos++;
+        ptr = ptr->right;
+    }
+    
+    if (ptr == NULL)
+    {
+        printf("ValueError: %d is not in list\n", value);
+        return -1;
+    }
+}
+
+/*
+void remove(int value)
+{
+    // under implementation
+    exit(0);
+}
+*/
+
+int count(int value)
+{
+    int count = 0;
+    struct Node *ptr = head;
+    while(ptr != NULL)
+    {
+        if (ptr->data == value)
+            count++;
+        ptr = ptr->right;
+    }
+
+    return count;
 }
 
 void print_pylist()
@@ -180,5 +227,10 @@ void main()
     del(3);
     print_pylist(); 
     del(-4);
+    append(67);
+    append(67);
     print_pylist();
+    printf("%d\n", count(67));
+    printf("%d\n", indexOf(6));
+
 }
